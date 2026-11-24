@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="description" content="妖怪ウォッチ2のQRコード集。アイテムはカテゴリと名前で、妖怪は大辞典番号と名前で探せます。">
+  <title>妖怪ウォッチ2 真打限定 任意コード実行 QRまとめ</title>
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+  <script src="catalog.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header class="header">
+    <div class="wrap header-inner">
+      <a class="brand" href="./index.html">妖怪ウォッチ2 真打限定 任意コード実行 QRまとめ</a>
+      <nav class="tabs" aria-label="QRコードの種類">
+        <a href="#tab=item" data-tab="item">アイテム</a>
+        <a href="#tab=yokai" data-tab="yokai">妖怪</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap main">
+    <details class="prereq" id="prereq">
+      <summary class="prereq-summary">
+        <span class="prereq-title">前提条件</span>
+        <span class="prereq-hint">はじめての方はこちら</span>
+      </summary>
+      <div class="prereq-body">
+        <p>アイテムを受け取る前に、以下を確認してください。</p>
+        <ol class="prereq-steps">
+          <li>主人公がケータのデータを用意する。</li>
+          <li>おともを「うんがい鏡」に設定する。</li>
+          <li>家のベッドで寝て、時間帯を夜にする。</li>
+          <li>妖怪パッドのかべがみを「ひんやりブルー」に設定する。</li>
+          <li>こやぎ郵便の「うんがい鏡」と「キュピーン」を解放し、キュッピー経由で一度セーブする。</li>
+          <li>QR受付女に話しかけられる位置でセーブする。<span class="prereq-sub">このとき、3DS内の時計が18:00以上、翌6:00未満になるようにする（時間変更で合わせるのはNG）。</span></li>
+          <li>3DSを一度再起動する。</li>
+          <li>サイト内のQRを読み込むと、手持ちに入る。</li>
+        </ol>
+        <p class="prereq-note">※うんがい鏡、キュッピー解放済みの方は該当項目を飛ばしてください。</p>
+      </div>
+    </details>
+
+    <div class="controls">
+      <h1 id="section-title" class="visually-hidden">アイテム</h1>
+      <form class="search" id="search" role="search">
+        <input id="query" type="search" aria-label="アイテム名で検索" placeholder="アイテム名で検索" autocomplete="off">
+        <button type="button" id="clear-search" class="icon-button clear-search" aria-label="検索語を消去" hidden></button>
+      </form>
+      <label class="filters" id="item-filters">
+        <span>カテゴリ</span>
+        <span class="select-field"><select id="categories"></select></span>
+      </label>
+    </div>
+
+    <section aria-labelledby="result-heading">
+      <div class="results-header">
+        <h2 id="result-heading" tabindex="-1">すべてのアイテム</h2>
+        <span id="result-count" class="result-count" role="status"></span>
+      </div>
+      <ul class="entries" id="entries"></ul>
+      <div class="empty" id="empty" hidden>
+        <p>一致するQRコードがありません。</p>
+        <button type="button" class="secondary-button" id="reset">絞り込みをクリア</button>
+      </div>
+      <nav class="pager" id="pager" aria-label="ページ切り替え" hidden>
+        <button type="button" class="secondary-button" id="prev-page">前へ</button>
+        <span id="page-status" aria-live="polite"></span>
+        <button type="button" class="secondary-button" id="next-page">次へ</button>
+      </nav>
+    </section>
+    <noscript><p>QRコードを表示するにはJavaScriptを有効にしてください。</p></noscript>
+  </main>
+
+  <dialog class="qr-dialog" id="qr-dialog" aria-labelledby="dialog-title">
+    <div class="dialog-header">
+      <div>
+        <p class="dialog-meta" id="dialog-meta"></p>
+        <h2 id="dialog-title"></h2>
+      </div>
+      <button type="button" id="close-dialog" class="icon-button" aria-label="閉じる" autofocus></button>
+    </div>
+    <div class="qr-display" id="qr-display"></div>
+    <p class="dialog-help"><button type="button" id="show-prereq" class="text-button">アイテムを受け取れない場合は前提条件を確認</button></p>
+    <div class="dialog-actions">
+      <div class="variants" id="variants" role="group" aria-label="QR画像の切り替え" hidden></div>
+      <a id="save-image" class="primary-button" download>画像を保存</a>
+    </div>
+  </dialog>
+
+  <template id="entry-template">
+    <li>
+      <button class="entry" type="button" aria-haspopup="dialog">
+        <span class="entry-name"></span>
+        <span class="entry-meta"></span>
+        <span class="entry-action" aria-hidden="true">QR表示</span>
+      </button>
+    </li>
+  </template>
+</body>
+</html>
