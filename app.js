@@ -1,6 +1,8 @@
 "use strict";
 
-const { items, yokai, categories, tribes } = window.qrCatalog;
+const { items, yokai, bosses, categories, tribes } = window.qrCatalog;
+const groups = { item: items, yokai, boss: bosses };
+const folders = { item: "item", yokai: "yokai", boss: "boss_dex" };
 const collator = new Intl.Collator("ja", { numeric: true });
 const pageSize = 30;
 const $ = (selector) => document.querySelector(selector);
@@ -16,8 +18,14 @@ const dialog = $("#qr-dialog");
 const qrDisplay = $("#qr-display");
 const variants = $("#variants");
 const saveImage = $("#save-image");
+const scan = $("#scan");
+const scanCode = $("#scan-code");
+let currentEntry = null;
+let currentGroup = null;
+let currentIndex = 0;
 const prereq = $("#prereq");
 const prereqSummary = prereq.querySelector("summary");
+const trouble = $("#trouble");
 const categoryLabels = { all: "すべて", ...categories };
 let state = readLocation();
 
@@ -33,7 +41,7 @@ function numberLabel(number) {
 }
 
 function imageUrl(group, filename) {
-  return `qr/${group}/${encodeURIComponent(filename)}`;
+  return `qr/${folders[group]}/${encodeURIComponent(filename)}`;
 }
 
 function sortNames(a, b) {
@@ -44,17 +52,19 @@ function entryMeta(entry, group) {
   if (group === "item") return categories[entry.category];
   if (entry.number == null) return "大辞典番号不明";
   const number = `No. ${numberLabel(entry.number)}`;
+  if (group === "boss") return `${number} · 図鑑登録`;
   return tribes[entry.category] ? `${number} · ${tribes[entry.category]}` : number;
 }
 
 for (const item of items) {
   item.search = normalize(`${item.name} ${categories[item.category]}`);
 }
-for (const entry of yokai) {
+for (const entry of [...yokai, ...bosses]) {
   entry.search = normalize(`${entry.name} ${tribes[entry.category] ?? ""}`);
 }
 items.sort(sortNames);
 yokai.sort((a, b) => (a.number ?? Infinity) - (b.number ?? Infinity) || sortNames(a, b));
+bosses.sort((a, b) => (a.number ?? Infinity) - (b.number ?? Infinity) || sortNames(a, b));
 
 for (const [id, label] of Object.entries(categoryLabels)) {
   const option = document.createElement("option");
@@ -65,7 +75,8 @@ for (const [id, label] of Object.entries(categoryLabels)) {
 
 function readLocation() {
   const params = new URLSearchParams(location.hash.slice(1));
-  const tab = params.get("tab") === "yokai" ? "yokai" : "item";
+  const rawTab = params.get("tab");
+  const tab = Object.hasOwn(groups, rawTab) ? rawTab : "item";
   const category = params.get("category");
   const rawPage = Number(params.get("page"));
   return {
@@ -97,7 +108,7 @@ function setState(next, method = "replace") {
 
 function matches(entry, terms, group) {
   return terms.every((term) => {
-    if (group === "yokai" && /^(?:no)?\d{1,3}$/.test(term)) {
+    if (group !== "item" && /^(?:no)?\d{1,3}$/.test(term)) {
       return Number(term.replace(/^no/, "")) === entry.number;
     }
     return entry.search.includes(term);
@@ -117,16 +128,17 @@ function render() {
   const { tab, category, query } = state;
   const isItem = tab === "item";
   const terms = normalize(query).replace(/\bno\s+(?=\d)/g, "no").split(/\s+/).filter(Boolean);
-  const filtered = (isItem ? items : yokai).filter((entry) =>
+  const filtered = groups[tab].filter((entry) =>
     (!isItem || category === "all" || entry.category === category) && matches(entry, terms, tab)
   );
   const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize));
   state.page = Math.min(state.page, pageCount);
   const start = (state.page - 1) * pageSize;
 
-  $("#section-title").textContent = isItem ? "アイテム" : "妖怪";
+  $("#section-title").textContent = { item: "アイテム", yokai: "妖怪", boss: "ボス" }[tab];
   $("#item-filters").hidden = !isItem;
-  queryInput.placeholder = isItem ? "アイテム名で検索" : "妖怪名・大辞典番号で検索";
+  queryInput.placeholder = isItem ? "アイテム名で検索"
+    : tab === "boss" ? "ボス名・大辞典番号で検索" : "妖怪名・大辞典番号で検索";
   queryInput.setAttribute("aria-label", queryInput.placeholder);
   if (queryInput.value !== query) queryInput.value = query;
   clearSearch.hidden = query.length === 0;
@@ -136,7 +148,8 @@ function render() {
   }
   categorySelect.value = category;
 
-  resultHeading.textContent = isItem ? (category === "all" ? "すべてのアイテム" : categories[category]) : "大辞典順";
+  resultHeading.textContent = isItem ? (category === "all" ? "すべてのアイテム" : categories[category])
+    : tab === "boss" ? "図鑑番号順（図鑑登録のみ）" : "大辞典順";
   $("#result-count").textContent = `${filtered.length.toLocaleString("ja-JP")}件`;
   entryList.replaceChildren(...filtered.slice(start, start + pageSize).map((entry) => makeEntry(entry, tab)));
   entryList.hidden = filtered.length === 0;
@@ -148,12 +161,15 @@ function render() {
 }
 
 function openQr(entry, group) {
+  currentEntry = entry;
+  currentGroup = group;
   $("#dialog-title").textContent = entry.name;
   $("#dialog-meta").textContent = entryMeta(entry, group);
   variants.replaceChildren();
   variants.hidden = entry.images.length < 2;
 
   function showImage(index) {
+    currentIndex = index;
     const filename = entry.images[index];
     const url = imageUrl(group, filename);
     const image = new Image(1280, 1280);
@@ -179,6 +195,37 @@ function openQr(entry, group) {
   }
   showImage(0);
   dialog.showModal();
+}
+
+function enterScan() {
+  if (!currentEntry) return;
+  const url = imageUrl(currentGroup, currentEntry.images[currentIndex]);
+  scanCode.style.backgroundImage = `url("${url}")`;
+  dialog.close();
+  scan.hidden = false;
+  const hint = document.querySelector("#scan-hint");
+  hint.style.animation = "none";
+  void hint.offsetWidth;
+  hint.style.animation = "";
+  document.body.classList.add("scanning");
+  const root = document.documentElement;
+  if (root.requestFullscreen && !document.fullscreenElement) {
+    root.requestFullscreen().catch(() => {});
+  }
+}
+
+function exitScan() {
+  if (scan.hidden) return;
+  scan.hidden = true;
+  scanCode.style.backgroundImage = "";
+  document.body.classList.remove("scanning");
+  if (document.fullscreenElement && document.exitFullscreen) {
+    document.exitFullscreen().catch(() => {});
+  }
+  if (!currentEntry) return;
+  const index = currentIndex;
+  openQr(currentEntry, currentGroup);
+  if (index > 0 && variants.children[index]) variants.children[index].click();
 }
 
 function changePage(offset) {
@@ -213,11 +260,25 @@ $("#reset").addEventListener("click", () => {
 $("#prev-page").addEventListener("click", () => changePage(-1));
 $("#next-page").addEventListener("click", () => changePage(1));
 $("#close-dialog").addEventListener("click", () => dialog.close());
+$("#easy-mode").addEventListener("click", enterScan);
+scan.addEventListener("click", exitScan);
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && !scan.hidden) exitScan();
+});
+document.addEventListener("fullscreenchange", () => {
+  if (!document.fullscreenElement && !scan.hidden) exitScan();
+});
 $("#show-prereq").addEventListener("click", () => {
   dialog.close();
   prereq.open = true;
   prereq.scrollIntoView({ block: "start" });
   prereqSummary.focus({ preventScroll: true });
+});
+$("#show-trouble").addEventListener("click", () => {
+  dialog.close();
+  trouble.open = true;
+  trouble.scrollIntoView({ block: "start" });
+  trouble.querySelector("summary").focus({ preventScroll: true });
 });
 dialog.addEventListener("close", () => {
   if (!dialog.open) qrDisplay.replaceChildren();

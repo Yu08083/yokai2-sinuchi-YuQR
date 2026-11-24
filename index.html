@@ -18,6 +18,7 @@
       <nav class="tabs" aria-label="QRコードの種類">
         <a href="#tab=item" data-tab="item">アイテム</a>
         <a href="#tab=yokai" data-tab="yokai">妖怪</a>
+        <a href="#tab=boss" data-tab="boss">ボス</a>
       </nav>
     </div>
   </header>
@@ -41,6 +42,22 @@
           <li>サイト内のQRを読み込むと、手持ちに入る。</li>
         </ol>
         <p class="prereq-note">※うんがい鏡、キュッピー解放済みの方は該当項目を飛ばしてください。</p>
+      </div>
+    </details>
+
+    <details class="prereq" id="trouble">
+      <summary class="prereq-summary">
+        <span class="prereq-title">できない人用</span>
+        <span class="prereq-hint">QRを読み込んでも受け取れないとき</span>
+      </summary>
+      <div class="prereq-body">
+        <p>次の3つを試してから、もう一度はじめから行ってください。</p>
+        <ol class="prereq-steps">
+          <li>寝て昼にする → こぶた銀行へ行く → 「ムダヅカイ」の妖怪スポットが解放済みか確認する。解放していなければ解放する。</li>
+          <li>お供をウィスパー以外の適当な妖怪に設定する。</li>
+          <li>セーブして再起動し、手順を最初からやり直す。</li>
+        </ol>
+        <p class="prereq-note">QRが読み取りにくいときは、QR表示の「読み込みやすくする」を使ってください（白画面にQRだけを大きく出します）。</p>
       </div>
     </details>
 
@@ -84,12 +101,21 @@
       <button type="button" id="close-dialog" class="icon-button" aria-label="閉じる" autofocus></button>
     </div>
     <div class="qr-display" id="qr-display"></div>
-    <p class="dialog-help"><button type="button" id="show-prereq" class="text-button">アイテムを受け取れない場合は前提条件を確認</button></p>
+    <p class="dialog-help">
+      <button type="button" id="show-prereq" class="text-button">受け取れない場合は前提条件を確認</button>
+      <button type="button" id="show-trouble" class="text-button">それでもダメなとき</button>
+    </p>
     <div class="dialog-actions">
       <div class="variants" id="variants" role="group" aria-label="QR画像の切り替え" hidden></div>
+      <button type="button" id="easy-mode" class="secondary-button">読み込みやすくする</button>
       <a id="save-image" class="primary-button" download>画像を保存</a>
     </div>
   </dialog>
+
+  <div class="scan" id="scan" hidden>
+    <div class="scan-code" id="scan-code" role="img" aria-label="QRコード"></div>
+    <p class="scan-hint" id="scan-hint">クリック / Esc で戻る</p>
+  </div>
 
   <template id="entry-template">
     <li>

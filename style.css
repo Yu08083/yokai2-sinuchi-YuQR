@@ -191,3 +191,40 @@ body:has(.qr-dialog[open]) { overflow: hidden; }
   .entry-meta { grid-area: meta; }
   .entry-action { grid-area: action; }
 }
+
+/* 読み込みやすくするモード: 白画面にQRだけを大きく貼る */
+.scan {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  background: #fff;
+  cursor: zoom-out;
+}
+.scan[hidden] { display: none; }
+.scan-code {
+  width: 88vmin;
+  height: 88vmin;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 150%;
+  image-rendering: pixelated;
+}
+.scan-hint {
+  position: fixed;
+  right: 0;
+  bottom: max(.6rem, env(safe-area-inset-bottom));
+  left: 0;
+  margin: 0;
+  color: #999;
+  font-size: .78rem;
+  text-align: center;
+  pointer-events: none;
+  animation: scan-hint 4s ease forwards;
+}
+@keyframes scan-hint {
+  0%, 65% { opacity: .85; }
+  100% { opacity: 0; }
+}
+body.scanning { overflow: hidden; }
