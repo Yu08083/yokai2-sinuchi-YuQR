@@ -42,6 +42,10 @@ python yw2_export.py --kind boss     # → ~/Downloads/boss_dex/*.webp
 python catalog.py                    # → dist/catalog.js, dist/qr/*
 ```
 
+## クレジット
+
+- QRペイロードの元になった解析・実装: [0xiuks](https://github.com/0xiuks)
+
 ## 注意
 
 - ゲームのセーブデータを書き換える可能性があります。バックアップを取ってから使ってください。
