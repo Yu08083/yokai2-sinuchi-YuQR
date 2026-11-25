@@ -55,7 +55,7 @@ function sortNames(a, b) {
 
 function entryMeta(entry, group) {
   if (group === "item") return categories[entry.category];
-  if (group === "flag") return "ボス戦フラグ";
+  if (group === "flag") return "DLCフラグ";
   if (entry.number == null) return "大辞典番号不明";
   const number = `No. ${numberLabel(entry.number)}`;
   if (group === "boss") return `${number} · 図鑑登録`;
@@ -146,7 +146,7 @@ function render() {
   state.page = Math.min(state.page, pageCount);
   const start = (state.page - 1) * pageSize;
 
-  $("#section-title").textContent = { item: "アイテム", yokai: "妖怪", boss: "ボス", flag: "フラグ" }[tab];
+  $("#section-title").textContent = { item: "アイテム", yokai: "妖怪", boss: "ボス", flag: "DLC" }[tab];
   $("#item-filters").hidden = !isItem;
   $("#flag-note").hidden = tab !== "flag";
   queryInput.placeholder = isItem ? "アイテム名で検索"
@@ -166,7 +166,7 @@ function render() {
 
   resultHeading.textContent = isItem ? (category === "all" ? "すべてのアイテム" : categories[category])
     : tab === "boss" ? "図鑑番号順（図鑑登録のみ）"
-    : tab === "flag" ? "ボス戦フラグ（読み込みやすくする推奨）" : "大辞典順";
+    : tab === "flag" ? "DLCフラグ（読み込みやすくする推奨）" : "大辞典順";
   $("#result-count").textContent = `${filtered.length.toLocaleString("ja-JP")}件`;
   entryList.replaceChildren(...filtered.slice(start, start + pageSize).map((entry) => makeEntry(entry, tab)));
   entryList.hidden = filtered.length === 0;
