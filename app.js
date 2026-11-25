@@ -55,7 +55,7 @@ function sortNames(a, b) {
 
 function entryMeta(entry, group) {
   if (group === "item") return categories[entry.category];
-  if (group === "flag") return "ボス戦フラグ（3ビット書き込み）";
+  if (group === "flag") return "ボス戦フラグ";
   if (entry.number == null) return "大辞典番号不明";
   const number = `No. ${numberLabel(entry.number)}`;
   if (group === "boss") return `${number} · 図鑑登録`;
