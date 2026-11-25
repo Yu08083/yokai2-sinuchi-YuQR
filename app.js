@@ -148,7 +148,6 @@ function render() {
 
   $("#section-title").textContent = { item: "アイテム", yokai: "妖怪", boss: "ボス", flag: "DLC" }[tab];
   $("#item-filters").hidden = !isItem;
-  $("#flag-note").hidden = tab !== "flag";
   queryInput.placeholder = isItem ? "アイテム名で検索"
     : tab === "flag" ? "ボス名で検索"
     : tab === "boss" ? "ボス名・大辞典番号で検索" : "妖怪名・大辞典番号で検索";
