@@ -243,3 +243,17 @@ body.scanning { overflow: hidden; }
   cursor: pointer;
 }
 .gender button[aria-pressed="true"] { background: #242424; border-color: #242424; color: #fff; }
+
+/* フラグタブの注意書き */
+.flag-note {
+  margin: 0 0 1rem;
+  padding: .6rem .75rem;
+  border: 1px solid var(--line);
+  background: #f7f7f7;
+  color: var(--muted);
+  font-size: .85rem;
+  line-height: 1.7;
+}
+
+/* 読み込みモードのQRは整数倍で描くので、輪郭をぼかさない */
+.scan-code canvas { display: block; }

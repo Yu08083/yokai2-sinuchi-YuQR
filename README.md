@@ -6,12 +6,13 @@
 - アイテム 1,040件
 - 妖怪 398件（図鑑番号つき）
 - ボス 50件（図鑑登録のみ）
+- ボス戦フラグ 4件（ワンダーニャン / ロボニャンF型 / セーラーニャン / マスクドニャーン）
 
 ## 使い方
 
 1. トップの「前提条件」を確認する
 2. 右上の「主人公」で **男 / 女** を選ぶ（セーブの性別に合わせる）
-3. タブ（アイテム / 妖怪 / ボス）を選ぶ
+3. タブ（アイテム / 妖怪 / ボス / フラグ）を選ぶ
 4. 名前・図鑑番号で絞り込み、行をクリックしてQRを表示
 5. QRを3DSのカメラで読み取る
 
@@ -20,6 +21,10 @@
 
 読み取りにくいときは、QR表示の **「読み込みやすくする」** を押すと
 白画面にQRだけを大きく出します。クリック / Esc で戻ります。
+このときQRは1モジュール=整数pxで描き直すので、拡大しても輪郭が崩れません。
+
+フラグのQRはモジュール数が多く（v21）、画面が小さいと読み取りにくいです。
+PCの画面で開くか、画像を保存して印刷すると読み取りやすくなります。
 
 受け取れないときは **「できない人用」** を確認してください。
 
@@ -36,6 +41,8 @@ tinko/boss_dex/   ボス図鑑QR（男セーブ用）
 manko/item/       アイテムQR（女セーブ用）
 manko/yokai/      妖怪QR（女セーブ用）
 manko/boss_dex/   ボス図鑑QR（女セーブ用）
+flag_male/        ボス戦フラグQR（男セーブ用）
+flag_female/      ボス戦フラグQR（女セーブ用）
 ```
 
 画像はすべて可逆WebP（`VP8L` のみ、メタ情報なし）です。
@@ -53,7 +60,7 @@ python yw2_export.py --kind boss
 python yw2_export.py --kind both --b 0x16574FF4 --out female
 python yw2_export.py --kind boss --b 0x16574FF4 --out female
 
-python catalog.py    # → dist/catalog.js, dist/tinko/*, dist/manko/*
+python catalog.py    # → dist/catalog.js, dist/tinko/*, dist/manko/*, dist/flag_*
 ```
 
 ## クレジット
