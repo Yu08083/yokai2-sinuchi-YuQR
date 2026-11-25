@@ -3,10 +3,13 @@
 const { items, yokai, bosses, categories, tribes } = window.qrCatalog;
 const groups = { item: items, yokai, boss: bosses };
 const folders = { item: "item", yokai: "yokai", boss: "boss_dex" };
+const setFolders = { male: "tinko", female: "manko" };
+let imageSet = "male";
 const collator = new Intl.Collator("ja", { numeric: true });
 const pageSize = 30;
 const $ = (selector) => document.querySelector(selector);
 const tabs = [...document.querySelectorAll("[data-tab]")];
+const setButtons = [...document.querySelectorAll("[data-set]")];
 const queryInput = $("#query");
 const clearSearch = $("#clear-search");
 const categorySelect = $("#categories");
@@ -41,7 +44,7 @@ function numberLabel(number) {
 }
 
 function imageUrl(group, filename) {
-  return `qr/${folders[group]}/${encodeURIComponent(filename)}`;
+  return `${setFolders[imageSet]}/${folders[group]}/${encodeURIComponent(filename)}`;
 }
 
 function sortNames(a, b) {
@@ -77,6 +80,7 @@ function readLocation() {
   const params = new URLSearchParams(location.hash.slice(1));
   const rawTab = params.get("tab");
   const tab = Object.hasOwn(groups, rawTab) ? rawTab : "item";
+  imageSet = params.get("set") === "female" ? "female" : "male";
   const category = params.get("category");
   const rawPage = Number(params.get("page"));
   return {
@@ -90,6 +94,7 @@ function readLocation() {
 function writeLocation(method) {
   const params = new URLSearchParams();
   if (state.tab !== "item") params.set("tab", state.tab);
+  if (imageSet !== "male") params.set("set", imageSet);
   if (state.category !== "all") params.set("category", state.category);
   if (state.query) params.set("q", state.query);
   if (state.page > 1) params.set("page", String(state.page));
@@ -145,6 +150,9 @@ function render() {
   for (const link of tabs) {
     if (link.dataset.tab === tab) link.setAttribute("aria-current", "page");
     else link.removeAttribute("aria-current");
+  }
+  for (const button of setButtons) {
+    button.setAttribute("aria-pressed", String(button.dataset.set === imageSet));
   }
   categorySelect.value = category;
 
@@ -241,6 +249,15 @@ for (const link of tabs) {
     if (link.dataset.tab !== state.tab) {
       setState({ tab: link.dataset.tab, category: "all", query: "", page: 1 }, "push");
     }
+  });
+}
+for (const button of setButtons) {
+  button.addEventListener("click", () => {
+    if (button.dataset.set === imageSet) return;
+    imageSet = button.dataset.set;
+    render();
+    writeLocation("push");
+    if (dialog.open && currentEntry) openQr(currentEntry, currentGroup);
   });
 }
 $("#search").addEventListener("submit", (event) => event.preventDefault());
