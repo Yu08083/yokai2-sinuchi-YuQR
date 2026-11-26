@@ -23,8 +23,9 @@
 白画面にQRだけを大きく出します。クリック / Esc で戻ります。
 このときQRは1モジュール=整数pxで描き直すので、拡大しても輪郭が崩れません。
 
-DLCフラグのQRはモジュール数が多く（v21）、画面が小さいと読み取りにくいです。
-PCの画面で開くか、画像を保存して印刷すると読み取りやすくなります。
+QRはペイロードを LZ10 で圧縮してあり、モジュール数が少なめです
+（アイテム v16 / 図鑑つき妖怪 v17）。画面が小さくても読み取りやすくなっています。
+それでも読みにくいときは、画像を保存して印刷してください。
 
 受け取れないときは **「できない人用」** を確認してください。
 
@@ -53,12 +54,12 @@ QRは `yw2_export.py` で作り、`catalog.py` が `catalog.js` と `qr/` を組
 
 ```
 # 男（B = 0x1657AFF4）
-python yw2_export.py --kind both
-python yw2_export.py --kind boss
+python yw2_export.py --kind both --compress
+python yw2_export.py --kind boss --compress
 
 # 女（B = 0x16574FF4、owner は B に追従）
-python yw2_export.py --kind both --b 0x16574FF4 --out female
-python yw2_export.py --kind boss --b 0x16574FF4 --out female
+python yw2_export.py --kind both --compress --b 0x16574FF4 --out female
+python yw2_export.py --kind boss --compress --b 0x16574FF4 --out female
 
 python catalog.py    # → dist/catalog.js, dist/tinko/*, dist/manko/*, dist/flag_*
 ```
