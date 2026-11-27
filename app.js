@@ -6,6 +6,10 @@ const folders = {
   male: { item: "tinko/item", yokai: "tinko/yokai", boss: "tinko/boss_dex", flag: "flag_male" },
   female: { item: "manko/item", yokai: "manko/yokai", boss: "manko/boss_dex", flag: "flag_female" },
 };
+const smallFolders = {
+  male: { item: "tinko_small/item", yokai: "tinko_small/yokai", boss: "tinko_small/boss_dex", flag: "flag_male" },
+  female: { item: "manko_small/item", yokai: "manko_small/yokai", boss: "manko_small/boss_dex", flag: "flag_female" },
+};
 let imageSet = "male";
 const collator = new Intl.Collator("ja", { numeric: true });
 const pageSize = 30;
@@ -47,6 +51,10 @@ function numberLabel(number) {
 
 function imageUrl(group, filename) {
   return `${folders[imageSet][group]}/${encodeURIComponent(filename)}`;
+}
+
+function imageUrlSmall(group, filename) {
+  return `${smallFolders[imageSet][group]}/${encodeURIComponent(filename)}`;
 }
 
 function sortNames(a, b) {
@@ -269,16 +277,19 @@ function scanCanvas(image) {
 
 function enterScan() {
   if (!currentEntry) return;
-  const url = imageUrl(currentGroup, currentEntry.images[currentIndex]);
-  const source = qrDisplay.querySelector("img");
-  const canvas = source && source.complete ? scanCanvas(source) : null;
-  if (canvas) {
+  // 読み取りやすくするモードは LZ10 圧縮版（小さいQR）を使う
+  const url = imageUrlSmall(currentGroup, currentEntry.images[currentIndex]);
+  scanCode.replaceChildren();
+  scanCode.style.backgroundImage = `url("${url}")`;
+  const image = new Image();
+  image.onload = () => {
+    if (scan.hidden) return;
+    const canvas = scanCanvas(image);
+    if (!canvas) return;
     scanCode.replaceChildren(canvas);
     scanCode.style.backgroundImage = "";
-  } else {
-    scanCode.replaceChildren();
-    scanCode.style.backgroundImage = `url("${url}")`;
-  }
+  };
+  image.src = url;
   dialog.close();
   scan.hidden = false;
   const hint = document.querySelector("#scan-hint");

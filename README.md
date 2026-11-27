@@ -23,9 +23,9 @@
 白画面にQRだけを大きく出します。クリック / Esc で戻ります。
 このときQRは1モジュール=整数pxで描き直すので、拡大しても輪郭が崩れません。
 
-QRはペイロードを LZ10 で圧縮してあり、モジュール数が少なめです
-（アイテム v16 / 図鑑つき妖怪 v17）。画面が小さくても読み取りやすくなっています。
-それでも読みにくいときは、画像を保存して印刷してください。
+この「読み込みやすくする」では、**LZ10圧縮版の小さいQR**（アイテム v16 / 図鑑つき妖怪 v17）を
+表示します。通常表示のQRは v18〜v19 です。小さい方が読み取りやすいので、
+うまくいかないときはこちらを使ってください。
 
 受け取れないときは **「できない人用」** を確認してください。
 
@@ -42,6 +42,8 @@ tinko/boss_dex/   ボス図鑑QR（男セーブ用）
 manko/item/       アイテムQR（女セーブ用）
 manko/yokai/      妖怪QR（女セーブ用）
 manko/boss_dex/   ボス図鑑QR（女セーブ用）
+tinko_small/      男セーブ用の小さいQR（読み込みやすくするモードで使用）
+manko_small/      女セーブ用の小さいQR（同上）
 flag_male/        DLCフラグQR（男セーブ用）
 flag_female/      DLCフラグQR（女セーブ用）
 ```
@@ -53,15 +55,21 @@ flag_female/      DLCフラグQR（女セーブ用）
 QRは `yw2_export.py` で作り、`catalog.py` が `catalog.js` と `qr/` を組み立てます。
 
 ```
-# 男（B = 0x1657AFF4）
-python yw2_export.py --kind both --compress
-python yw2_export.py --kind boss --compress
+# 男（B = 0x1657AFF4）通常QR
+python yw2_export.py --kind both --out tinko
+python yw2_export.py --kind boss --out tinko
 
-# 女（B = 0x16574FF4、owner は B に追従）
-python yw2_export.py --kind both --compress --b 0x16574FF4 --out female
-python yw2_export.py --kind boss --compress --b 0x16574FF4 --out female
+# 男・小さいQR（読み込みやすくするモード用）
+python yw2_export.py --kind both --compress --out tinko_small
+python yw2_export.py --kind boss --compress --out tinko_small
 
-python catalog.py    # → dist/catalog.js, dist/tinko/*, dist/manko/*, dist/flag_*
+# 女（B = 0x16574FF4、owner は B に追従）通常QR
+python yw2_export.py --kind both --b 0x16574FF4 --out manko
+python yw2_export.py --kind boss --b 0x16574FF4 --out manko
+
+# 女・小さいQR
+python yw2_export.py --kind both --compress --b 0x16574FF4 --out manko_small
+python yw2_export.py --kind boss --compress --b 0x16574FF4 --out manko_small
 ```
 
 ## クレジット
